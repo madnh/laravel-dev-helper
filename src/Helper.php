@@ -293,7 +293,7 @@ class Helper
     {
         $result_array = [];
         $keys = array_keys($array);
-        if (\NodaHelper::is_numeric_array($array)) {
+        if (self::isNumericArray($array)) {
             $result_array = array_slice($array, 0);
             sort($result_array);
         } else {

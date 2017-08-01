@@ -30,7 +30,6 @@ trait PublishAssets
          * @var SplFileInfo[] $files
          */
         $files = \File::allFiles($src);
-        $this->resetOrderedList();
         foreach ($files as $file) {
             $target = $dest . DIRECTORY_SEPARATOR . $file->getRelativePathname();
 

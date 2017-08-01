@@ -53,7 +53,6 @@ class BasePublish extends BaseCommand
     protected function doPublishMethods($methods)
     {
         foreach ($methods as $method) {
-            $this->softTitle('Publish method "<info>' . $method . '"</info>');
             $this->{$method}();
         }
     }
