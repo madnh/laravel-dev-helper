@@ -1,0 +1,25 @@
+{
+  "name": "madnh/laravel-dev-helper",
+  "description": "Laravel Development Helpers",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "MaDnh",
+      "email": "dodanhmanh@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "MaDnh\\LaravelDevHelper\\": "src/"
+    }
+  },
+  "require": {
+    "laravel/framework": "~5.2",
+    "madnh/laravel-command-util": "^1.1"
+  },
+  "suggest": {
+    "madnh/laravel-model-labels": "Allow to add locale label to model's fields",
+    "prettus/l5-repository": "Require to use class BaseRepository"
+  }
+}
