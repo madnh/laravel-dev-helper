@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Helper
 {
-    public function beautyPath($path)
+    public static function beautyPath($path)
     {
         return str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
     }
@@ -18,7 +18,7 @@ class Helper
      * @param array $rule Rules, item key is destination name, value is source name
      * @return mixed
      */
-    public function arrayRename(&$array, array $rule)
+    public static function arrayRename(&$array, array $rule)
     {
         $renamed_keys = [];
         foreach ($rule as $dest => $src) {
@@ -43,7 +43,7 @@ class Helper
      * @param string $default_dir Default direction, ASC
      * @return array
      */
-    public function parserOrderByInfo($value, $fields, $default_field = null, $default_dir = 'ASC')
+    public static function parserOrderByInfo($value, $fields, $default_field = null, $default_dir = 'ASC')
     {
         $field = $default_field;
         $direction = $default_dir;
@@ -79,7 +79,7 @@ class Helper
      * @param Model $model
      * @return array Array with fields: old, new - contain old and new attributes value
      */
-    public function parseModelDirty($model)
+    public static function parseModelDirty($model)
     {
         $result = [];
         $dirty = $model->getDirty();
@@ -97,12 +97,12 @@ class Helper
      * @param mixed $value
      * @return bool
      */
-    public function castToBoolean($value)
+    public static function castToBoolean($value)
     {
-        return $this->cast($value, 'bool');
+        return self::cast($value, 'bool');
     }
 
-    public function moveItemInArrayToTop($array, $searchField, $value)
+    public static function moveItemInArrayToTop($array, $searchField, $value)
     {
         $key = array_search($value, array_column($array, $searchField));
 
@@ -118,7 +118,7 @@ class Helper
     /**
      * @return null
      */
-    public function firstNotEmpty()
+    public static function firstNotEmpty()
     {
         $items = func_get_args();
         foreach ($items as $item) {
@@ -137,7 +137,7 @@ class Helper
      * @param string $file_ext If not special then auto detect
      * @return string
      */
-    public function appendFilename($file_name, $append_info, $file_ext = '')
+    public static function appendFilename($file_name, $append_info, $file_ext = '')
     {
         if (empty($file_ext)) {
             $file_ext = File::extension($file_name);
@@ -147,7 +147,7 @@ class Helper
     }
 
 
-    public function notEmpty($value)
+    public static function notEmpty($value)
     {
         return !empty($value);
     }
@@ -159,7 +159,7 @@ class Helper
      * @param mixed $default
      * @return mixed|null
      */
-    public function arrayOneOf(&$value, $array, $default = null)
+    public static function arrayOneOf(&$value, $array, $default = null)
     {
         if (in_array($value, $array)) {
             return $value;
@@ -179,7 +179,7 @@ class Helper
      * @param bool $remove_old_key Remove old key
      * @return array
      */
-    public function arrayTransform($array, $rename_guide, $remove_old_key = true)
+    public static function arrayTransform($array, $rename_guide, $remove_old_key = true)
     {
         $renamed = [];
 
@@ -207,7 +207,7 @@ class Helper
      * @return array
      * @throws \Exception
      */
-    public function arrayTransformReverseOrder($array, $rename_guide, $remove_old_key = true)
+    public static function arrayTransformReverseOrder($array, $rename_guide, $remove_old_key = true)
     {
         $array_keys = array_keys($array);
         $array_values = array_values($array);
@@ -237,14 +237,14 @@ class Helper
         return array_combine($array_keys, $array_values);
     }
 
-    public function removeDir($path)
+    public static function removeDir($path)
     {
         $dir = opendir($path);
         while (false !== ($file = readdir($dir))) {
             if (($file != '.') && ($file != '..')) {
                 $full = $path . '/' . $file;
                 if (is_dir($full)) {
-                    $this->removeDir($full);
+                    self::removeDir($full);
                 } else {
                     unlink($full);
                 }
@@ -254,7 +254,7 @@ class Helper
         rmdir($path);
     }
 
-    public function objectToArray($object)
+    public static function objectToArray($object)
     {
         if (method_exists($object, 'toArray')) {
             return $object->toArray();
@@ -278,7 +278,7 @@ class Helper
         return $array;
     }
 
-    public function isNumericArray($array)
+    public static function isNumericArray($array)
     {
         foreach (array_keys($array) as $key) {
             if (!is_int($key)) {
@@ -289,7 +289,7 @@ class Helper
         return true;
     }
 
-    public function arrayInOrder($array, $cast_object_to_array = true)
+    public static function arrayInOrder($array, $cast_object_to_array = true)
     {
         $result_array = [];
         $keys = array_keys($array);
@@ -300,9 +300,9 @@ class Helper
             sort($keys);
             foreach ($keys as $key) {
                 if (is_array($array[$key])) {
-                    $result_array[$key] = $this->arrayInOrder($array[$key], $cast_object_to_array);
+                    $result_array[$key] = self::arrayInOrder($array[$key], $cast_object_to_array);
                 } else if (is_object($array[$key]) && $cast_object_to_array) {
-                    $result_array[$key] = $this->objectToArray($array[$key]);
+                    $result_array[$key] = self::objectToArray($array[$key]);
                 } else {
                     $result_array[$key] = $array[$key];
                 }
@@ -312,9 +312,9 @@ class Helper
         return $result_array;
     }
 
-    public function hashIdOfArray($array)
+    public static function hashIdOfArray($array)
     {
-        $array_ordered = $this->arrayInOrder($array);
+        $array_ordered = self::arrayInOrder($array);
 
         return md5(serialize($array_ordered));
     }
@@ -328,7 +328,7 @@ class Helper
      * @param string $algorithm Hash algorithm, default is sha1
      * @return string
      */
-    public function hashValue($value, $reorder_array = true, $algorithm = 'sha1')
+    public static function hashValue($value, $reorder_array = true, $algorithm = 'sha1')
     {
         $special_prefix = '(P@\'-3@M$3\2<>y:4-{]Z.V}$~;\:r'; //DO NOT EDIT THIS VALUE!!!
         $value_as_string = null;
@@ -340,21 +340,21 @@ class Helper
             $value_as_string = $special_prefix . '_NULL';
         } else if (is_array($value) || is_object($value)) {
             if (is_array($value)) {
-                $value_as_string = serialize($reorder_array ? $this->arrayInOrder($value) : $value);
+                $value_as_string = serialize($reorder_array ? self::arrayInOrder($value) : $value);
             } else {
-                $value_as_string = serialize($reorder_array ? $this->arrayInOrder($this->objectToArray($value)) : $this->objectToArray($value));
+                $value_as_string = serialize($reorder_array ? self::arrayInOrder(self::objectToArray($value)) : self::objectToArray($value));
             }
         }
 
         return hash($algorithm, $value_as_string);
     }
 
-    public function stdClassToArray(&$obj)
+    public static function stdClassToArray(&$obj)
     {
         $obj = (array)$obj;
     }
 
-    public function arrayShiftIndex($array, $shift_value)
+    public static function arrayShiftIndex($array, $shift_value)
     {
         $result = [];
         $keys = array_keys($array);
@@ -369,14 +369,14 @@ class Helper
         return $result;
     }
 
-    public function publishPathToUrl($publish_path, $full = true)
+    public static function publishPathToUrl($publish_path, $full = true)
     {
         $sub_path = substr($publish_path, strlen(public_path()) + 1);
 
         return $full ? asset($sub_path) : $sub_path;
     }
 
-    public function pathBuild()
+    public static function pathBuild()
     {
         return implode(DIRECTORY_SEPARATOR, array_flatten(func_get_args()));
     }
@@ -389,7 +389,7 @@ class Helper
      * @param $filename
      * @return string
      */
-    public function cleanFilename($filename)
+    public static function cleanFilename($filename)
     {
         $filename = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
         //Remove any runs of periods
@@ -398,7 +398,7 @@ class Helper
         return $filename;
     }
 
-    public function sanitizeFileName($dangerousFilename, $platform = 'Unix')
+    public static function sanitizeFileName($dangerousFilename, $platform = 'Unix')
     {
         if (in_array(strtolower($platform), array('unix', 'linux'))) {
             // our list of "dangerous characters", add/remove
@@ -419,7 +419,7 @@ class Helper
      * @param  mixed $value
      * @return \Carbon\Carbon
      */
-    public function asDateTime($value)
+    public static function asDateTime($value)
     {
         // If this value is already a Carbon instance, we shall just return it as is.
         // This prevents us having to re-instantiate a Carbon instance when we know
@@ -462,7 +462,7 @@ class Helper
      * @param $targetType
      * @return mixed
      */
-    public function cast($value, $targetType)
+    public static function cast($value, $targetType)
     {
         if (is_null($value)) {
             return $value;
@@ -493,9 +493,9 @@ class Helper
                 return collect(json_decode($value, true));
             case 'date':
             case 'datetime':
-                return $this->asDateTime($value);
+                return self::asDateTime($value);
             case 'timestamp':
-                return $this->asDateTime($value)->getTimestamp();
+                return self::asDateTime($value)->getTimestamp();
             default:
                 return $value;
         }
@@ -507,7 +507,7 @@ class Helper
      * @param string|number $string
      * @return \Closure
      */
-    public function prependCb($string)
+    public static function prependCb($string)
     {
         return function ($value) use ($string) {
             return $string . $value;
@@ -520,7 +520,7 @@ class Helper
      * @param string|number $string
      * @return \Closure
      */
-    public function appendCb($string)
+    public static function appendCb($string)
     {
         return function ($value) use ($string) {
             return $value . $value;
@@ -534,7 +534,7 @@ class Helper
      * @param $array
      * @return array
      */
-    public function arrayHasKeys($array)
+    public static function arrayHasKeys($array)
     {
         $result = [];
 
@@ -543,42 +543,5 @@ class Helper
         }
 
         return $result;
-    }
-
-    /**
-     * Resize a image and store as another file
-     * @param string $file_path
-     * @param string $new_file_path
-     * @param null|integer $width
-     * @param null|integer $height
-     * @param bool $aspect_ratio
-     * @param bool $prevent_upsize Default is no
-     */
-    public function resizeImage($file_path, $new_file_path, $width = null, $height = null, $aspect_ratio = false, $prevent_upsize = false)
-    {
-
-        \Image::make($file_path)->resize($width, $height, function ($constraint) use ($aspect_ratio, $prevent_upsize) {
-            /**
-             * @var \Intervention\Image\Constraint $constraint
-             */
-            if ($aspect_ratio) {
-                $constraint->aspectRatio();
-            }
-            if ($prevent_upsize) {
-                $constraint->upsize();
-            }
-        })->save($new_file_path);
-    }
-
-    /**
-     * Fit a image and store as another file
-     * @param string $file_path
-     * @param string $new_file_path
-     * @param null|integer $width
-     * @param null|integer $height
-     */
-    public function fitImage($file_path, $new_file_path, $width, $height = null)
-    {
-        \Image::make($file_path)->fit($width, $height)->save($new_file_path);
     }
 }
