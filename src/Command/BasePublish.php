@@ -6,6 +6,7 @@ namespace MaDnh\LaravelDevHelper\Command;
 
 use MaDnh\LaravelDevHelper\Command\Exceptions\PublishCommandMissingServiceProviderClassName;
 use MaDnh\LaravelDevHelper\Command\Traits\PublishAssets;
+use function Symfony\Component\Debug\Tests\testHeader;
 
 /**
  * Usage:
@@ -34,11 +35,12 @@ class BasePublish extends BaseCommand
 
         $methods = [];
         $vendorTags = [];
+        $publishMethods = array_flip($this->getPublishMethods());
 
         foreach ($argMethods as $argMethod) {
             $studlyMethod = 'publish' . studly_case($argMethod);
 
-            if (method_exists($this, $studlyMethod)) {
+            if (array_key_exists($studlyMethod, $publishMethods)) {
                 $methods[] = $studlyMethod;
             } else {
                 $vendorTags[] = $argMethod;
@@ -54,6 +56,25 @@ class BasePublish extends BaseCommand
     }
 
     /**
+     * @return array
+     */
+    protected function getPublishMethods()
+    {
+        $publishMethods = [];
+        $methods = (new \ReflectionClass($this))->getMethods(\ReflectionMethod::IS_PUBLIC);
+
+        foreach ($methods as $method) {
+            $methodName = $method->getName();
+
+            if (starts_with($methodName, 'publish')) {
+                $publishMethods[] = $method->getName();
+            }
+        }
+
+        return $publishMethods;
+    }
+
+    /**
      * Show welcome message
      */
     protected function welcome()
@@ -61,19 +82,38 @@ class BasePublish extends BaseCommand
         $this->banner("Publish Assets");
     }
 
-    protected function publishVendor($tags = [])
+    public function publishAll()
     {
-        if (empty($this->serviceProviderClass)) {
-            throw new PublishCommandMissingServiceProviderClassName('Publish vendor missing service provider class: ' . static::class);
+        $publishMethods = array_except($this->getPublishMethods(), 'publishVendor');
+
+        foreach ($publishMethods as $method) {
+            $this->{$method}();
         }
 
-        $callData = [];
+        $this->publishVendor();
+    }
+
+    public function publishVendor($tags = [])
+    {
+        $this->softTitle('Publish Vendor of "<info>' . (!empty($tags) ? implode(', ', $tags) : 'all') . '</info>"');
 
         $vendorTags = $this->option('tags');
         $vendorTags = explode(',', $vendorTags);
         if (!empty($vendorTags)) {
             $tags = !empty($tags) ? array_merge($tags, $vendorTags) : $vendorTags;
         }
+
+        if (empty($this->serviceProviderClass)) {
+            if (!empty($tags)) {
+                throw new PublishCommandMissingServiceProviderClassName('Publish vendor missing service provider class: ' . static::class);
+            } else {
+                $this->info('Publish vendor service provider class is undefined, ignore');
+            }
+        }
+
+        $callData = [];
+
+
         if (!empty($tags)) {
             $callData['--tag'] = array_unique($tags);
         }
@@ -81,7 +121,6 @@ class BasePublish extends BaseCommand
         $callData['--force'] = $this->option('force');
         $callData['--provider'] = $this->serviceProviderClass;
 
-        $this->softTitle('Publish Vendor of "<info>' . (!empty($tags) ? implode(', ', $tags) : 'all') . '</info>"');
         $this->call('vendor:publish', $callData);
     }
 }
