@@ -98,8 +98,6 @@ class BasePublish extends BaseCommand
 
     public function publishVendor($tags = [])
     {
-        $this->softTitle('Publish Vendor of "<info>' . (!empty($tags) ? implode(', ', $tags) : 'all') . '</info>"');
-
         $vendorTags = $this->option('tags');
         $vendorTags = explode(',', $vendorTags);
         if (!empty($vendorTags)) {
@@ -124,6 +122,12 @@ class BasePublish extends BaseCommand
         $callData['--force'] = $this->option('force');
         $callData['--provider'] = $this->serviceProviderClass;
 
+        if (empty($tags)) {
+            $this->softTitle('Publish all vendor\' tags');
+        } else {
+            $this->softTitle('Publish vendor tags: <info>' . implode(', ', $tags) . '</info>');
+        }
+        
         $this->call('vendor:publish', $callData);
     }
 }
