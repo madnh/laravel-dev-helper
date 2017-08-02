@@ -6,7 +6,6 @@ namespace MaDnh\LaravelDevHelper\Command;
 
 use MaDnh\LaravelDevHelper\Command\Exceptions\PublishCommandMissingServiceProviderClassName;
 use MaDnh\LaravelDevHelper\Command\Traits\PublishAssets;
-use function Symfony\Component\Debug\Tests\testHeader;
 
 /**
  * Usage:
@@ -18,7 +17,7 @@ class BasePublish extends BaseCommand
 {
     use PublishAssets;
 
-    protected $signature = 'app:publish {methods?* : Publish methods} {--force : Overwrite any existing files} {--tag= : Publish tags when publish by vendor method}';
+    protected $signature = 'app:publish {methods?* : Publish methods} {--force : Overwrite any existing files} {--tags= : Publish tags when publish by vendor method}';
     protected $description = 'Publish assets';
     protected $serviceProviderClass = null;
 
@@ -40,7 +39,7 @@ class BasePublish extends BaseCommand
         foreach ($argMethods as $argMethod) {
             $studlyMethod = 'publish' . studly_case($argMethod);
 
-            if (array_key_exists('publishAll', $argMethods)) {
+            if ($studlyMethod === 'publishAll') {
                 $this->publishAll();
                 return;
             }
@@ -88,7 +87,7 @@ class BasePublish extends BaseCommand
 
     public function publishAll()
     {
-        $publishMethods = array_except($this->getPublishMethods(), ['publishVendor', 'publishAll']);
+        $publishMethods = array_diff($this->getPublishMethods(), ['publishVendor', 'publishAll']);
 
         foreach ($publishMethods as $method) {
             $this->{$method}();
