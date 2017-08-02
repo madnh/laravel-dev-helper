@@ -28,7 +28,7 @@ class BasePublish extends BaseCommand
         $argMethods = (array)$this->argument('methods');
 
         if (empty($argMethods)) {
-            $this->publishVendor();
+            $this->publishAll();
             return;
         }
 
