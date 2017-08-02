@@ -8,8 +8,8 @@ trait PublishAssets
 {
     public function doPublishDir($src, $dest, $replace = [], $debug = true)
     {
-        $src = rtrim($src, '\\/');
-        $dest = rtrim($dest, '\\/');
+        $src = realpath($src);
+        $dest = realpath($dest);
 
         if ($debug) {
             $basePathLength = strlen(base_path());
@@ -46,6 +46,7 @@ trait PublishAssets
      */
     public function doPublishFile($file, $target, $replace = [], $debug = true)
     {
+        $file = realpath($file);
         $content = file_get_contents($file);
 
         if (!empty($replace)) {
