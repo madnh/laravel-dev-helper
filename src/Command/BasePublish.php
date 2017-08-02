@@ -40,6 +40,10 @@ class BasePublish extends BaseCommand
         foreach ($argMethods as $argMethod) {
             $studlyMethod = 'publish' . studly_case($argMethod);
 
+            if (array_key_exists('publishAll', $argMethods)) {
+                $this->publishAll();
+                return;
+            }
             if (array_key_exists($studlyMethod, $publishMethods)) {
                 $methods[] = $studlyMethod;
             } else {
@@ -84,7 +88,7 @@ class BasePublish extends BaseCommand
 
     public function publishAll()
     {
-        $publishMethods = array_except($this->getPublishMethods(), 'publishVendor');
+        $publishMethods = array_except($this->getPublishMethods(), ['publishVendor', 'publishAll']);
 
         foreach ($publishMethods as $method) {
             $this->{$method}();
