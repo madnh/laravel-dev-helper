@@ -20,6 +20,7 @@
   },
   "suggest": {
     "madnh/laravel-model-labels": "Allow to add locale label to model's fields",
-    "prettus/l5-repository": "Require to use class BaseRepository"
+    "prettus/l5-repository": "Require to use class BaseRepository",
+    "laracasts/flash": "Require to work with ResponseUtil class"
   }
 }

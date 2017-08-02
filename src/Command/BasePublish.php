@@ -5,13 +5,14 @@ namespace MaDnh\LaravelDevHelper\Command;
 
 
 use MaDnh\LaravelDevHelper\Command\Exceptions\PublishCommandMissingServiceProviderClassName;
+use MaDnh\LaravelDevHelper\Command\Exceptions\PublishCommandWithUndefinedTag;
 use MaDnh\LaravelDevHelper\Command\Traits\PublishAssets;
 
 class BasePublish extends BaseCommand
 {
     use PublishAssets;
 
-    protected $signature = 'app:publish {tag?* : Publish tags} {--force : Overwrite any existing files}';
+    protected $signature = 'app:publish {methods?* : Publish methods} {--force : Overwrite any existing files} {--tag= : Publish tags when publish by vendor method}';
     protected $description = 'Publish assets';
     protected $serviceProviderClass = null;
 
@@ -19,26 +20,25 @@ class BasePublish extends BaseCommand
     {
         $this->welcome();
 
-        $tags = $this->argument('tag');
-        $methodTags = [];
-        $commandTags = [];
+        $methods = [];
+        $undefinedMethods = [];
+        $argMethods = (array)$this->argument('methods');
 
-        if (!empty($tags)) {
-            foreach ($tags as $tag) {
-                $studlyTag = 'publish' . studly_case($tag);
+        foreach ($argMethods as $argMethod) {
+            $studlyMethod = 'publish' . studly_case($argMethod);
 
-                if (method_exists($this, $studlyTag)) {
-                    $methodTags[] = $studlyTag;
-                } else {
-                    $commandTags[] = $tag;
-                }
+            if (method_exists($this, $studlyMethod)) {
+                $methods[] = $studlyMethod;
+            } else {
+                $undefinedMethods[] = $argMethod;
             }
         }
+        if (!empty($undefinedMethods)) {
+            throw new PublishCommandWithUndefinedTag('Publish assets with an undefined tag: ' . implode(', ', $undefinedMethods));
+        }
 
-        $this->doPublishMethods($methodTags);
-
-        if (!empty($commandTags)) {
-            $this->doPublishVendor($commandTags);
+        foreach ($methods as $method) {
+            $this->{$method}();
         }
     }
 
@@ -50,22 +50,18 @@ class BasePublish extends BaseCommand
         $this->banner("Publish Assets");
     }
 
-    protected function doPublishMethods($methods)
+    protected function publishVendor()
     {
-        foreach ($methods as $method) {
-            $this->{$method}();
-        }
-    }
-
-    protected function doPublishVendor($tags)
-    {
-        $this->softTitle('Publish Vendor');
-
         if (empty($this->serviceProviderClass)) {
             throw new PublishCommandMissingServiceProviderClassName('Publish vendor missing service provider class: ' . static::class);
         }
 
+        $this->softTitle('Publish Vendor of "<info>' . $this->serviceProviderClass . '</info>"');
+
         $callData = [];
+
+        $tags = $this->option('tags');
+        $tags = explode(',', $tags);
 
         if (!empty($tags)) {
             $callData['--tag'] = $tags;
