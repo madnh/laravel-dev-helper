@@ -99,8 +99,8 @@ class BasePublish extends BaseCommand
     public function publishVendor($tags = [])
     {
         $vendorTags = $this->option('tags');
-        $vendorTags = explode(',', $vendorTags);
         if (!empty($vendorTags)) {
+            $vendorTags = explode(',', $vendorTags);
             $tags = !empty($tags) ? array_merge($tags, $vendorTags) : $vendorTags;
         }
 
@@ -127,7 +127,7 @@ class BasePublish extends BaseCommand
         } else {
             $this->softTitle('Publish vendor tags: <info>' . implode(', ', $tags) . '</info>');
         }
-        
+
         $this->call('vendor:publish', $callData);
     }
 }
