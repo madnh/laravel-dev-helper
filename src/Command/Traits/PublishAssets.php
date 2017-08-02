@@ -8,8 +8,8 @@ trait PublishAssets
 {
     public function doPublishDir($src, $dest, $replace = [], $debug = true)
     {
-        $src = trim($src, '\\/');
-        $dest = trim($dest, '\\/');
+        $src = rtrim($src, '\\/');
+        $dest = rtrim($dest, '\\/');
 
         if ($debug) {
             $basePathLength = strlen(base_path());
