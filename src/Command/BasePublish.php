@@ -6,6 +6,8 @@ namespace MaDnh\LaravelDevHelper\Command;
 
 use MaDnh\LaravelDevHelper\Command\Exceptions\PublishCommandMissingServiceProviderClassName;
 use MaDnh\LaravelDevHelper\Command\Traits\PublishAssets;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Usage:
@@ -17,9 +19,29 @@ class BasePublish extends BaseCommand
 {
     use PublishAssets;
 
-    protected $signature = 'app:publish {methods?* : Publish methods} {--force : Overwrite any existing files} {--tags= : Publish tags when publish by vendor method}';
+    protected $signature = 'app:publish';
     protected $description = 'Publish assets';
     protected $serviceProviderClass = null;
+
+    protected function getArguments()
+    {
+        $parts = array_map(function ($method) {
+            return '- ' . $method;
+        }, $this->getPublishMethods());
+
+        return [
+            ['parts', InputArgument::OPTIONAL, "Parts to publish, supports:\n" . implode("\n", $parts)]
+        ];
+    }
+
+    protected function getOptions()
+    {
+        return [
+            ['force', InputOption::VALUE_NONE, 'Overwrite any existing files'],
+            ['tags', InputOption::VALUE_OPTIONAL, 'Publish tags (or group) registered in service provider']
+        ];
+    }
+
 
     public function handle()
     {
