@@ -19,7 +19,7 @@ class BasePublish extends BaseCommand
 {
     use PublishAssets;
 
-    protected $signature = 'app:publish';
+    protected $name = 'app:publish';
     protected $description = 'Publish assets';
     protected $serviceProviderClass = null;
 
