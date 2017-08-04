@@ -26,11 +26,11 @@ class BasePublish extends BaseCommand
     protected function getArguments()
     {
         $parts = array_map(function ($method) {
-            return '- ' . $method;
-        }, $this->getPublishMethods());
+            return '- ' . strtolower(substr($method, 7));
+        }, array_except($this->getPublishMethods(), 'publishAll'));
 
         return [
-            ['parts', InputArgument::OPTIONAL, "Parts to publish, supports:\n" . implode("\n", $parts)]
+            ['parts', InputArgument::OPTIONAL, "Parts to publish, supports:\n" . implode("\n", $parts)."\nAnd <info>all</info> to publish all of parts"]
         ];
     }
 
