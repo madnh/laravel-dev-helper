@@ -30,7 +30,7 @@ class BasePublish extends BaseCommand
         }, $this->getPublishMethods());
 
         return [
-            ['part', InputArgument::REQUIRED | InputArgument::IS_ARRAY, "Parts to publish, supports:\n" . implode("\n", $parts) . "\nUse <info>all</info> to publish all of parts"]
+            ['part', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, "Parts to publish, supports:\n" . implode("\n", $parts) . "\nUse <info>all</info> to publish all of parts"]
         ];
     }
 
