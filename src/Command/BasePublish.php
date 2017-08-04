@@ -37,8 +37,8 @@ class BasePublish extends BaseCommand
     protected function getOptions()
     {
         return [
-            ['force', InputOption::VALUE_NONE, 'Overwrite any existing files'],
-            ['tags', InputOption::VALUE_OPTIONAL, 'Publish tags (or group) registered in service provider']
+            ['force', 'f', InputOption::VALUE_NONE, 'Overwrite any existing files'],
+            ['tags', null, InputOption::VALUE_REQUIRED, 'Publish tags (or group) registered in service provider']
         ];
     }
 
