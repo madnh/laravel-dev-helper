@@ -26,11 +26,11 @@ class BasePublish extends BaseCommand
     protected function getArguments()
     {
         $parts = array_map(function ($method) {
-            return '- ' . strtolower(substr($method, 7));
-        }, array_except($this->getPublishMethods(), 'publishAll'));
+            return '- ' . snake_case(substr($method, 7));
+        }, array_diff($this->getPublishMethods(), ['publishAll']));
 
         return [
-            ['parts', InputArgument::OPTIONAL, "Parts to publish, supports:\n" . implode("\n", $parts)."\nAnd <info>all</info> to publish all of parts"]
+            ['parts', InputArgument::OPTIONAL, "Parts to publish, supports:\n" . implode("\n", $parts) . "\nAnd <info>all</info> to publish all of parts"]
         ];
     }
 
@@ -47,32 +47,32 @@ class BasePublish extends BaseCommand
     {
         $this->welcome();
 
-        $argMethods = (array)$this->argument('methods');
+        $argParts = (array)$this->argument('parts');
 
-        if (empty($argMethods)) {
+        if (empty($argParts)) {
             $this->publishAll();
             return;
         }
 
-        $methods = [];
+        $parts = [];
         $vendorTags = [];
         $publishMethods = array_flip($this->getPublishMethods());
 
-        foreach ($argMethods as $argMethod) {
-            $studlyMethod = 'publish' . studly_case($argMethod);
+        foreach ($argParts as $argPart) {
+            $studlyPart = 'publish' . studly_case($argPart);
 
-            if ($studlyMethod === 'publishAll') {
+            if ($studlyPart === 'publishAll') {
                 $this->publishAll();
                 return;
             }
-            if (array_key_exists($studlyMethod, $publishMethods)) {
-                $methods[] = $studlyMethod;
+            if (array_key_exists($studlyPart, $publishMethods)) {
+                $parts[] = $studlyPart;
             } else {
-                $vendorTags[] = $argMethod;
+                $vendorTags[] = $argPart;
             }
         }
 
-        foreach ($methods as $method) {
+        foreach ($parts as $method) {
             $this->{$method}();
         }
         if (!empty($vendorTags)) {
