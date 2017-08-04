@@ -78,6 +78,8 @@ class BasePublish extends BaseCommand
         if (!empty($vendorTags)) {
             $this->publishVendor($vendorTags);
         }
+        
+        $this->info("\n\nComplete!");
     }
 
     /**
@@ -123,7 +125,6 @@ class BasePublish extends BaseCommand
         $vendorTags = $this->option('tag');
 
         if (!empty($vendorTags)) {
-            $vendorTags = explode(',', $vendorTags);
             $tags = !empty($tags) ? array_merge($tags, $vendorTags) : $vendorTags;
         }
 
