@@ -27,10 +27,10 @@ class BasePublish extends BaseCommand
     {
         $parts = array_map(function ($method) {
             return '- ' . snake_case(substr($method, 7));
-        }, array_diff($this->getPublishMethods(), ['publishAll']));
+        }, $this->getPublishMethods());
 
         return [
-            ['parts', InputArgument::OPTIONAL, "Parts to publish, supports:\n" . implode("\n", $parts) . "\nAnd <info>all</info> to publish all of parts"]
+            ['part', InputArgument::REQUIRED | InputArgument::IS_ARRAY, "Parts to publish, supports:\n" . implode("\n", $parts) . "\nUse <info>all</info> to publish all of parts"]
         ];
     }
 
@@ -38,7 +38,7 @@ class BasePublish extends BaseCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Overwrite any existing files'],
-            ['tags', null, InputOption::VALUE_REQUIRED, 'Publish tags (or group) registered in service provider']
+            ['tag', 't', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Publish tag (or group) registered by service provider']
         ];
     }
 
@@ -47,7 +47,7 @@ class BasePublish extends BaseCommand
     {
         $this->welcome();
 
-        $argParts = (array)$this->argument('parts');
+        $argParts = (array)$this->argument('part');
 
         if (empty($argParts)) {
             $this->publishAll();
@@ -120,7 +120,8 @@ class BasePublish extends BaseCommand
 
     public function publishVendor($tags = [])
     {
-        $vendorTags = $this->option('tags');
+        $vendorTags = $this->option('tag');
+
         if (!empty($vendorTags)) {
             $vendorTags = explode(',', $vendorTags);
             $tags = !empty($tags) ? array_merge($tags, $vendorTags) : $vendorTags;
