@@ -15,8 +15,7 @@
     }
   },
   "require": {
-    "laravel/framework": "~5.2",
-    "madnh/laravel-command-util": "^1.1"
+    "madnh/laravel-command-util": "^1.2"
   },
   "suggest": {
     "madnh/laravel-model-labels": "Allow to add locale label to model's fields",
