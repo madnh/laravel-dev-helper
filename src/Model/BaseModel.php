@@ -42,10 +42,18 @@ class BaseModel extends Model
     protected $resource_perm_only = [];
     protected $resource_perm_excepts = [];
 
+    /**
+     * Auto append resource urls when export model
+     * @var bool
+     */
+    protected $resource_auto_append = true;
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
-        $this->appends[] = 'resource_url';
+        if($this->resource_auto_append){
+            $this->appends[] = 'resource_url';
+        }
     }
 }

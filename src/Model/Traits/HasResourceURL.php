@@ -6,6 +6,18 @@ namespace MaDnh\LaravelDevHelper\Model\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 
+/**
+ * Trait HasResourceURL
+ *
+ * @package MaDnh\LaravelDevHelper\Model\Traits
+ *
+ * @property array $resource_excepts
+ * @property string $resource_perm_prefix
+ * @property array $resource_names
+ * @property array $resource_perm_only
+ * @property array $resource_perm_excepts
+ * @property array $resource_perm_aliases
+ */
 trait HasResourceURL
 {
     /*
@@ -41,7 +53,7 @@ trait HasResourceURL
         $resourcePrefix = $this->getResourcePrefix();
         $resourceParameters = $this->getResourceParameters();
 
-        $resource_full = (!empty($resourcePrefix) ? ($resourcePrefix . '.') : '') . $resourceTypeName;
+        $resource_full = (! empty($resourcePrefix) ? ($resourcePrefix . '.') : '') . $resourceTypeName;
         $resource_names = array_except($this->arrayHasKeys($this->getResourceNames()), $this->getExceptResources());
         $resourceRequirePerms = $this->getRequirePermResources();
 
@@ -49,7 +61,7 @@ trait HasResourceURL
         foreach ($resource_names as $resource_name => $resource_route_name) {
             try {
                 if (array_key_exists($resource_name, $resourceRequirePerms)) {
-                    if (!$user || !$this->checkResourcePerm($user, $resourceRequirePerms[$resource_name], $resourceParameters)) {
+                    if ( ! $user || ! $this->checkResourcePerm($user, $resourceRequirePerms[$resource_name], $resourceParameters)) {
                         continue;
                     }
                 }
@@ -72,6 +84,7 @@ trait HasResourceURL
      * Ex: ['a', 'b' => 'B'] => ['a' => 'a', 'b' =>'B']
      *
      * @param $array
+     *
      * @return array
      */
     protected function arrayHasKeys($array)
@@ -86,9 +99,10 @@ trait HasResourceURL
     }
 
     /**
-     * @param Authorizable $user
-     * @param array|string $abilities
+     * @param Authorizable     $user
+     * @param array|string     $abilities
      * @param null|Model|array $resourceParameters
+     *
      * @return bool
      */
     protected function checkResourcePerm($user, $abilities, $resourceParameters = null)
@@ -115,7 +129,7 @@ trait HasResourceURL
         $permOnly = property_exists($this, 'resource_perm_only') ? (array)$this->resource_perm_only : [];
         $permExcepts = property_exists($this, 'resource_perm_excepts') ? (array)$this->resource_perm_excepts : [];
         $resourceRequirePerms = array_except(
-            !empty($permOnly) ? array_only($resourcePerms, $permOnly) : $resourcePerms,
+            ! empty($permOnly) ? array_only($resourcePerms, $permOnly) : $resourcePerms,
             $permExcepts
         );
 
@@ -124,7 +138,7 @@ trait HasResourceURL
 
     protected function getResourcePrefix()
     {
-        if (property_exists($this, 'resource_prefix') && !empty($this->resource_prefix)) {
+        if (property_exists($this, 'resource_prefix') && ! empty($this->resource_prefix)) {
             return $this->resource_prefix;
         }
 
@@ -133,7 +147,7 @@ trait HasResourceURL
 
     protected function getResourceTypeName()
     {
-        if (property_exists($this, 'resource') && !empty($this->resource)) {
+        if (property_exists($this, 'resource') && ! empty($this->resource)) {
             $resource = $this->resource;
         } else {
             $resource = strtolower(str_plural(snake_case(class_basename(static::class))));
