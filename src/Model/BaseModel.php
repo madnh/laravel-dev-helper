@@ -53,7 +53,14 @@ class BaseModel extends Model
         parent::__construct($attributes);
 
         if($this->resource_auto_append){
-            $this->appends[] = 'resource_url';
+            $this->appendResourceURL();
         }
+    }
+
+    public function dynamicAppend($attributes)
+    {
+        $this->appends = array_merge($this->appends, (array)$attributes);
+
+        return $this;
     }
 }

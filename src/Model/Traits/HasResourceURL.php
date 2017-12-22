@@ -200,5 +200,8 @@ trait HasResourceURL
         return [];
     }
 
-
+    public function appendResourceURL()
+    {
+        $this->appends[] = 'resource_url';
+    }
 }
